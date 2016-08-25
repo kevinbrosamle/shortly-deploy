@@ -3,6 +3,21 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        separator: ';'
+      },
+      library: {
+        src: ['public/lib/jquery.js', 'public/lib/underscore.js', 'public/lib/backbone.js', 'public/lib/handlebars.js'],
+        dest: 'public/dist/library.min.js'
+      },
+      client: {
+        src: ['public/client/**/*.js'],
+        dest: 'public/dist/client.min.js'
+      },
+      css: {
+        src: ['public/style.css'],
+        dest: 'public/dist/styles.min.css'
+      }
     },
 
     mochaTest: {
@@ -21,15 +36,28 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      myTarget: {
+        files: {
+          'public/dist/client.min.js': 'public/dist/client.min.js',
+          'public/dist/library.min.js': 'public/dist/library.min.js'
+        }
+      }
     },
 
     eslint: {
-      target: [
-        // Add list of files to lint here
-      ]
+      target: ['public/client/*']
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/styles.min.css': 'public/dist/styles.min.css'
+        }
+      }
+    },
+
+    clean: {
+      contents: ['public/dist/*']
     },
 
     watch: {
@@ -55,6 +83,7 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -77,7 +106,10 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'clean', 'concat', 'cssmin', 'uglify'
   ]);
+
+
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
@@ -88,6 +120,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('deploy', [
+    'eslint', 'build'
     // add your deploy tasks here
   ]);
 
